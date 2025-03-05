@@ -3,14 +3,14 @@ import { useState, useEffect } from "react";
 const socket = new WebSocket("ws://localhost:8080");
 
 export default function PlanningPoker() {
-  const [role, setRole] = useState(null);
+  const [role, setRole] = useState<"Moderator" | "Participant" | null>(null);
   const [name, setName] = useState("");
-  const [selectedCard, setSelectedCard] = useState(null);
+  const [selectedCard, setSelectedCard] = useState<number | null>(null);
   const [votes, setVotes] = useState<{ name: string; value: number }[]>([]);
   const [users, setUsers] = useState<string[]>([]);
   const [hasJoined, setHasJoined] = useState(false);
   const [showVotes, setShowVotes] = useState(false);
-  const [userVotes, setUserVotes] = useState({});
+  const [userVotes, setUserVotes] = useState<{ [key: string]: boolean }>({});
 
   const cards = [1, 2, 3, 5, 8, 13, 21];
 
@@ -40,7 +40,7 @@ export default function PlanningPoker() {
     };
   }, []);
 
-  const handleVote = (value) => {
+  const handleVote = (value: number) => {
     if (!name) return; // Ensure name is set before sending vote
     setSelectedCard(value);
     console.log("Received value in handleVote", value)
