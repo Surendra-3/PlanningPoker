@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 
-const socket = new WebSocket("ws://localhost:8080");
+const socket = new WebSocket("https://websocketforplanningpoker.onrender.com/");
 
 export default function PlanningPoker() {
   const [role, setRole] = useState<"Moderator" | "Participant" | null>(null);
@@ -62,7 +62,7 @@ export default function PlanningPoker() {
 
   return (
     <div className="flex flex-col min-h-screen p-4 text-center">
-      <h1 className="text-4xl font-bold">Planning Poker</h1>
+      <h1 className="text-4xl font-bold">Planning Story Points</h1>
       
       {!role && (
         <div className="mt-6">
