@@ -20,11 +20,11 @@ export default function PlanningPoker() {
       console.log(" useEffect Received WebSocket message:", message); // Debug log
       switch (message.type) {
         case "vote":
-          //setVotes((prevVotes) => [...prevVotes, { name: message.name, value: message.value }]);
-          setVotes((prevVotes) => {
-            const updatedVotes = prevVotes.filter(vote => vote.name !== message.name);
-            return [...updatedVotes, { name: message.name, value: message.value }];
-          });
+          setVotes((prevVotes) => [...prevVotes, { name: message.name, value: message.value }]);
+          // setVotes((prevVotes) => {
+          //   const updatedVotes = prevVotes.filter(vote => vote.name !== message.name);
+          //   return [...updatedVotes, { name: message.name, value: message.value }];
+          // });
           setUserVotes((prev) => ({ ...prev, [message.name]: true }));
           break;
         case "user-joined":
@@ -52,14 +52,20 @@ export default function PlanningPoker() {
 
   const handleJoin = () => {
     if (name.trim() !== "") {
-      const message = JSON.stringify({ type: "user-joined", name });
+      const message = JSON.stringify({ type: "user-joined", name, role });
+      
       console.log("Sending WebSocket message:", message); // Debug log
+      if(role === 'Moderator')
+      {
+        const voteData = JSON.stringify({ type: "vote", name: name, value: 0 });
+        console.log("Sending WebSocket message:", message); // Debug log
+        socket.send(voteData);
+      }
       socket.send(message);
       setHasJoined(true);
     }
   };
   
-
   return (
     <div className="flex flex-col min-h-screen p-4 text-center">
       <h1 className="text-4xl font-bold">Planning Story Points</h1>
@@ -84,7 +90,40 @@ export default function PlanningPoker() {
           <button className="px-4 py-2 m-2 bg-blue-500 text-white rounded" onClick={handleJoin}>Join</button>
         </div>
       )}
-      
+
+      {role === "Moderator" && name && hasJoined && users.length > 0 && (
+        <div className="relative w-96 h-96 mt-6 flex items-center justify-center">
+           
+          <div className="absolute w-64 h-64 bg-gray-200 rounded-full flex items-center justify-center relative">
+            {showVotes && (
+              <ul className="absolute inset-0 flex flex-wrap items-center justify-center">
+                {votes.map((vote, index) => (
+                  <li key={index} className="absolute" style={{
+                    //transform: `rotate(${(360 / votes.length) * index}deg) translate(50px) rotate(-${(360 / votes.length) * index}deg)`
+                    transform: `rotate(${(360 / votes.length) * index}deg) translate(80px) rotate(-${(360 / votes.length) * index}deg)`
+                  }}>
+                    {vote.value}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+          {users.map((user, index) => (
+            <div 
+              key={index} 
+              className="absolute"
+              style={{
+                // transform: `rotate(${(360 / users.length) * index}deg) translate(100px) rotate(-${(360 / users.length) * index}deg)`
+                //transform: `rotate(${(360 / users.length) * index}deg) translate(120px) rotate(-${(360 / users.length) * index}deg)`
+                transform: `rotate(${(360 / users.length) * index}deg) translate(150px) rotate(-${(360 / users.length) * index}deg)`
+              }}
+            >
+              {user}  {userVotes[user]}
+            </div>
+          ))}
+        </div>
+      )}
+
       {role === "Participant" && name && hasJoined && !showVotes && (
         <div className="mt-6">
           <h2>Select a vote:</h2>
@@ -102,13 +141,18 @@ export default function PlanningPoker() {
         </div>
       )}
       
-      {role === "Moderator" && name && hasJoined && users.length > 0 && (
+      {/* {role === "Moderator" && name && hasJoined && users.length > 0 && (
         <div className="mt-6">
           <h2>Users Joined:</h2>
           <ul>
             {users.map((user, index) => (
               //<li key={index}>{user}</li>
-              <li key={index}  className="mt-1">{user} - {userVotes[user] ? "✅" : "⏳"}</li>
+              <li key={index}  className="mt-1">{user} 
+              {user != name} ?
+              ({ userVotes[user] ? "✅" : "⏳"} ):
+              ""
+              
+              </li>
               // <li key={index}>
               //   {user} {uservotes[user] ? "" : ""}
               // </li>
@@ -116,7 +160,7 @@ export default function PlanningPoker() {
           </ul>
         </div>
       )}
-      
+       */}
       {role === "Moderator" && name && hasJoined && (
         <div className="mt-6">
         <button 
@@ -131,12 +175,12 @@ export default function PlanningPoker() {
         </div>
       )}
       
-      {showVotes && (
+      {/* {showVotes && (
         <div className="mt-6">
           {votes.length > 0 ? (
             <>
               <h2 className="mt-4">Votes:</h2>
-              <ul>
+              <ul>`
                 {votes.map((vote, index) => (
                   <li key={index} className="mt-1">{vote.name}: {vote.value}</li>
                 ))}
@@ -146,7 +190,7 @@ export default function PlanningPoker() {
             <h2 className="mt-4">Votes: None yet</h2>
           )}
         </div>
-      )}
+      )} */}
     </div>
   );
 }
